@@ -18,6 +18,8 @@ This project will demonstrate how Hedge fund or Mutual fund built their Long/Sho
 **Modular Pipeline** – Think of this like a factor assembly line: development → alpha signals → risk controls → trade execution → performance review. Each step plugs into the next, so you can swap out or upgrade any piece without blowing up the entire workflow.
 
 Python Code-
+
+
 import pandas as pd
 import numpy as np
 
