@@ -17,6 +17,72 @@ This project will demonstrate how Hedge fund or Mutual fund built their Long/Sho
 
 **Modular Pipeline** – Think of this like a factor assembly line: development → alpha signals → risk controls → trade execution → performance review. Each step plugs into the next, so you can swap out or upgrade any piece without blowing up the entire workflow.
 
+Python Code-
+import pandas as pd
+import numpy as np
+
+def load_data(filepath: str) -> pd.DataFrame:
+    """
+    Load your Excel/CSV into a DataFrame.
+    """
+    # e.g. pd.read_excel, pd.read_csv, etc.
+    data = pd.read_excel(filepath)
+    return data
+
+def clean_series(series: pd.Series, window: int = 5) -> pd.Series:
+    """
+    Moderate outliers (e.g. rolling winsorize) and fill missing values.
+    """
+    # placeholder: implement your cleaning logic here
+    cleaned = series.clip(lower=series.quantile(0.01), upper=series.quantile(0.99))
+    return cleaned.fillna(method="ffill")
+
+def transform_series(series: pd.Series, methods: list) -> pd.Series:
+    """
+    Apply transforms like:
+      - 'zscore_time': z-score across time
+      - 'decile_sector': cross-sectional decile ranking
+    """
+    x = series.copy()
+    if "zscore_time" in methods:
+        x = (x - x.mean()) / x.std()
+    if "decile_sector" in methods:
+        # placeholder: group by sector and assign quantiles
+        x = x.rank(pct=True).mul(10).astype(int)
+    return x
+
+def analyze_factor(name: str, factor: pd.Series, target: pd.Series, n_quantiles: int = 5) -> dict:
+    """
+    Compute your Information Coefficient, quintile returns, hit rate, etc.
+    """
+    results = {}
+    # e.g. results['IC'] = factor.corr(target, method='spearman')
+    # e.g. compute average return per quantile
+    return results
+
+def main():
+    # --- 1) Load your raw data ---
+    df = load_data("DataAllCap.xlsx")
+    
+    # --- 2) Prepare returns series ---
+    returns = df["Returns_AP"]  # rename as needed
+    
+    # --- 3) Pick a factor to test ---
+    raw_factor = df["Price_EarningsF12M_AP"]
+    
+    # --- 4) Clean it ---
+    cleaned = clean_series(raw_factor, window=5)
+    
+    # --- 5) Transform it ---
+    transformed = transform_series(cleaned, methods=["zscore_time", "decile_sector"])
+    
+    # --- 6) Analyze ---
+    stats = analyze_factor("P/E (12m Fwd)", transformed, returns, n_quantiles=5)
+    
+    print(f"Analysis for {stats}")
+
+if __name__ == "__main__":
+    main()
 
 
 
